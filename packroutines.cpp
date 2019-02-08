@@ -94,3 +94,80 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 	return packerrorSuccess;
 
 }
+
+int packfiles(char* path, char* mask, char* archive) {
+	return packfilesEx(path, mask, archive, NULL);
+}
+
+int unpackfiles(char* archive, char* dest, long startPos) {
+	return unpackfilesEx(archive, dest, startPos, NULL);
+}
+
+int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb) {
+
+	FILE* fpArchive = fopen(archive, "rb");
+
+	if (!fpArchive) return packerrorCouldNotOpenArchive;
+
+	long nFiles;
+
+	if (startPos)
+		fseek(fpArchive, startPos, SEEK_SET);
+
+	// read signature
+	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
+
+	if (nFiles != 'KCPL') return (fclose(fpArchive), packerrorNotAPackedFile);
+
+	// read files entries count
+	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
+
+	// no files?
+	if (!nFiles) return (fclose(fpArchive), packerrorNoFiles);
+
+	// read all files entries
+	std::vector<packdata_t> filesList(nFiles);
+	fread(&filesList[0], sizeof(packdata_t), nFiles, fpArchive);
+
+	// loop in all files
+	for (unsigned int i = 0; i < filesList.size()l i++) {
+
+		FILE* fpOut;
+		char buffer[4096];
+		packdata_t *pdata = &filesList[i];
+
+		// trigger callback
+		if (pcb && pcb->newfile)
+			pcb->newfile(pdata->filename, pdata->filesize);
+
+
+		strcpy(buffer, dest);
+		strcat(buffer, pdata->filename);
+		fpOut = fopen(buffer, "wb");
+
+		if (!fpOut)
+			return (fclose(fpArchive), packerrorExtractError);
+
+		// how many chunks of Buffer_Size is there is in filesize?
+		long size = pdata->filesize;
+		long pos = 0;
+
+		while (size > 0)
+		{
+			long toread = size > sizeof(buffer) ? sizeof(buffer) : size;
+			fread(buffer, toread, 1, fpArchive);
+			fwrite(buffer, toread, 1, fpOut);
+			pos += toread;
+			size -= toread;
+			if (pcb && pcb->fileprogress)
+				pcb->fileprogress(pos);
+		}
+		fclose(fpOut);
+		nFiles--;
+
+	}
+
+	fclose(fpArchive);
+	return packerrorSuccess;
+
+}
