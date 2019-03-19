@@ -76,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,11 +119,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cipher.cpp" />
     <ClCompile Include="packer.cpp" />
     <ClCompile Include="packroutines.cpp" />
-    <ClCompile Include="callbackTest.cpp" />
+    <ClCompile Include="unpacker.cpp" />
+    <ClCompile Include="unpacksfxstub.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cipher.h" />
     <ClInclude Include="packroutines.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

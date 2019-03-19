@@ -1,4 +1,5 @@
 #include "packroutines.h"
+#include "cipher.h"
 
 const char* packerrors_str[] = {
 	"Success",
@@ -9,6 +10,7 @@ const char* packerrors_str[] = {
 	"Failed while extracting one of the files",
 	"Input archive file failed to open"
 };
+char key[3] = { 'k', 'e', 'y' };
 
 int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 
@@ -37,7 +39,7 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 
 		memset(&pdata, 0, sizeof(pdata));
 
-		strcpy(pdata.filename, fd.cFileName);
+		strcpy_s(pdata.filename, fd.cFileName);
 
 		pdata.filesize = fd.nFileSizeLow;
 
@@ -77,8 +79,11 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 		long pos = 0;
 		while (size > 0) {
 			char buffer[4096];
+			
 			long toread = size > sizeof(buffer) ? sizeof(buffer) : size;
 			fread(buffer, toread, 1, inFile);
+			for (int i = 0; i < sizeof(buffer); i++) // for loop for scrambing bits in the string 
+				buffer[i] = buffer[i] ^ key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
 			fwrite(buffer, toread, 1, fpArchive);
 			pos += toread;
 			size -= toread;
@@ -130,7 +135,7 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 	fread(&filesList[0], sizeof(packdata_t), nFiles, fpArchive);
 
 	// loop in all files
-	for (unsigned int i = 0; i < filesList.size()l i++) {
+	for (unsigned int i = 0; i < filesList.size(); i++) {
 
 		FILE* fpOut;
 		char buffer[4096];
@@ -141,8 +146,8 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 			pcb->newfile(pdata->filename, pdata->filesize);
 
 
-		strcpy(buffer, dest);
-		strcat(buffer, pdata->filename);
+		strcpy_s(buffer, dest);
+		strcat_s(buffer, pdata->filename);
 		fpOut = fopen(buffer, "wb");
 
 		if (!fpOut)
@@ -156,6 +161,8 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 		{
 			long toread = size > sizeof(buffer) ? sizeof(buffer) : size;
 			fread(buffer, toread, 1, fpArchive);
+			for (int i = 0; i < sizeof(buffer); i++) // for loop for scrambing bits in the string 
+				buffer[i] = buffer[i] ^ key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
 			fwrite(buffer, toread, 1, fpOut);
 			pos += toread;
 			size -= toread;
@@ -170,4 +177,40 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 	fclose(fpArchive);
 	return packerrorSuccess;
 
+}
+
+
+int SfxGetInsertPos(char *filename, long *pos)
+{
+	FILE *fp = fopen(filename, "rb");
+	if (fp == NULL)
+		return packerrorCouldNotOpenArchive;
+
+	IMAGE_DOS_HEADER idh;
+
+	fread((void *)&idh, sizeof(idh), 1, fp);
+	fclose(fp);
+	*pos = *(long *)&idh.e_res2[0];
+	return packerrorSuccess;
+}
+
+int SfxSetInsertPos(char *filename, long pos)
+{
+	FILE *fp = fopen(filename, "rb+");
+	if (fp == NULL)
+		return packerrorCouldNotOpenArchive;
+
+	IMAGE_DOS_HEADER idh;
+
+	// read dos header
+	fread((void *)&idh, sizeof(idh), 1, fp);
+
+	// adjust position value in an unused MZ field
+	*(long *)&idh.e_res2[0] = pos;
+
+	// update header
+	rewind(fp);
+	fwrite((void *)&idh, sizeof(idh), 1, fp);
+	fclose(fp);
+	return packerrorSuccess;
 }

@@ -35,7 +35,7 @@ typedef struct {
 int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* = NULL);
 int packfiles(char *path, char *mask, char *archive);
 
-int unpackfilesEx(char *archive, char *dest, packcallbacks_t * = NULL, long startPos = 0);
+int unpackfilesEx(char *archive, char *dest, long startPos = 0, packcallbacks_t * = NULL);
 int unpackfiles(char *archive, char *dest, long startPos = 0);
 
 int SfxSetInsertPos(char *filename, long pos);

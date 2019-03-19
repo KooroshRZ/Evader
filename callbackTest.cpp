@@ -15,7 +15,7 @@ void B(void(*ptr)())
 	(*ptr) (); // callback to A 
 }
 
-int main()
+/*int main()
 {
 	void(*ptr)() = &A;
 
@@ -25,3 +25,4 @@ int main()
 	Sleep(5000);
 	return 0;
 }
+*/
