@@ -1,4 +1,3 @@
-
 #include "packroutines.h"
 #include <conio.h>
 
@@ -10,13 +9,7 @@ void newfile_cb(char *fn, long size)
 int main(int argc, char *argv[])
 {
 	char outDirectory[MAX_PATH];
-
-	if (argc < 2)
-	{
-		printf("Usage: UnpackerSFX Dest\nExample: UnpackerSfx c:\\games");
-		return 1;
-	}
-
+	
 	char arcFn[MAX_PATH];
 	long pos;
 #ifdef MYDEBUG
@@ -36,11 +29,12 @@ int main(int argc, char *argv[])
 	pcb.newfile = newfile_cb;
 
 	// fix output directory
-	strcpy(outDirectory, argv[1]);
+	strcpy(outDirectory, "./");
 	if (outDirectory[strlen(outDirectory) - 1] != '\\')
 		strcat(outDirectory, "\\");
 
 	printf("UnpackerSFX v1.0 (c) lallous\n");
+
 
 	// start unpacking
 	int rc = unpackfilesEx(arcFn, outDirectory, pos, &pcb);
@@ -49,6 +43,5 @@ int main(int argc, char *argv[])
 	else
 		printf("\nOperation succeeded!\n");
 
-	//getch();
 	return 0;
 }

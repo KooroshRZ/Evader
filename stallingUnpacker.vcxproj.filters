@@ -32,10 +32,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="packroutines.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="cipher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packroutines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

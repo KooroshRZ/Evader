@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <iostream>
+#include <conio.h>
+#include <time.h>
+
 
 
 enum packerrors {
@@ -40,5 +44,8 @@ int unpackfiles(char *archive, char *dest, long startPos = 0);
 
 int SfxSetInsertPos(char *filename, long pos);
 int SfxGetInsertPos(char *filename, long *pos);
+
+void setKey(char* key, int key_size);
+bool retrieveKey(char* readSignature, int signatureSize);
 
 #endif

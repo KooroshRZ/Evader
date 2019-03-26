@@ -1,5 +1,4 @@
-/*
-#include "packroutines.h"
+/*#include "packroutines.h"
 
 const char sfxStubFile[] = "unpacksfxstub.exe";
 

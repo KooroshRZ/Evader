@@ -1,5 +1,11 @@
 #include "packroutines.h"
-#include "cipher.h"
+
+#define KEY_SIZE 3
+#define STARTASCII 65
+#define ENDASCII 91
+char key[KEY_SIZE];
+char mainsignature[] = "EVADERPROJECT";
+
 
 const char* packerrors_str[] = {
 	"Success",
@@ -10,7 +16,7 @@ const char* packerrors_str[] = {
 	"Failed while extracting one of the files",
 	"Input archive file failed to open"
 };
-char key[3] = { 'k', 'e', 'y' };
+
 
 int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 
@@ -28,10 +34,22 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 	packdata_t pdata;
 
 	findHandle = FindFirstFile(mask, &fd);
+
 	if (findHandle == INVALID_HANDLE_VALUE)
 		return packerrorNoFiles;
 
-	long lTemp;
+	char SIG[13];
+	long nfiles;
+
+	// set a random key
+	setKey(key, KEY_SIZE);
+	for (int i = 0; i < sizeof(SIG); i++){
+		SIG[i] = mainsignature[i] ^ key[i % sizeof(key) / sizeof(char)];
+		std::cout << SIG[i];
+	}
+		
+	//std::cout << "\n" << sizeof(SIG) << "\n";
+	//Sleep(2000);
 
 	do {
 
@@ -55,12 +73,12 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 	if (!fpArchive) return packerrorCannotCreateArchive;
 
 	// write signature
-	lTemp = 'KCPL';
-	fwrite(&lTemp, sizeof(lTemp), 1, fpArchive);
+	//lTemp = 'KCPL';
+	fwrite(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
 	// write entries count
-	lTemp = filesList.size();
-	fwrite(&lTemp, sizeof(lTemp), 1, fpArchive);
+	nfiles = filesList.size();
+	fwrite(&nfiles, sizeof(nfiles), 1, fpArchive);
 
 	// store files entries (since std::vector stores elements in a linear manner)
 	fwrite(&filesList[0], sizeof(pdata), filesList.size(), fpArchive);
@@ -93,6 +111,8 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 		}
 		fclose(inFile); // close archive and restore working directory
 	}
+
+	// close archive
 	fclose(fpArchive);
 
 	SetCurrentDirectory(szCurDir);
@@ -114,15 +134,25 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 
 	if (!fpArchive) return packerrorCouldNotOpenArchive;
 
+	char SIG[13];
 	long nFiles;
 
 	if (startPos)
 		fseek(fpArchive, startPos, SEEK_SET);
 
 	// read signature
-	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
+	fread(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
-	if (nFiles != 'KCPL') return (fclose(fpArchive), packerrorNotAPackedFile);
+	for (int i = 0; i < sizeof(SIG); i++)
+		std::cout << SIG[i];
+
+
+	if (!retrieveKey(SIG, sizeof(SIG))) return (fclose(fpArchive), packerrorNotAPackedFile);
+
+	for (int i = 0; i < KEY_SIZE; i++)
+		std::cout << key[i];
+	std::cout << "\nbuuuuuuuu";
+	Sleep(2000);
 
 	// read files entries count
 	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
@@ -213,4 +243,66 @@ int SfxSetInsertPos(char *filename, long pos)
 	fwrite((void *)&idh, sizeof(idh), 1, fp);
 	fclose(fp);
 	return packerrorSuccess;
+}
+
+
+void setKey(char* key, int key_size) {
+
+	/*
+	static const char alphanum[] =
+		"!@#$%^&*()"
+		"0123456789"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz";
+	*/
+
+	srand(time(NULL));
+
+	for (int i = 0; i < key_size; ++i) {
+		//key[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+		key[i] = char(STARTASCII + rand() % (ENDASCII - STARTASCII + 1));
+		std::cout << key[i];
+	}
+	std::cout << "\n";
+
+}
+
+bool retrieveKey(char* readSignature, int signatureSize) {
+
+	//bruteforcing the encryption key
+
+	char retrievedSig[] = "aaaaaaaaaaaaaaaaaaaaa";
+	int i = KEY_SIZE;
+
+	for (int k = 0; k < KEY_SIZE; k++)
+		key[k] = STARTASCII;
+
+	while (i > -1) {
+
+		//print(retKey);
+		//for (int i = 0; i < KEY_SIZE; i++)
+			//std::cout << key[i];
+		//std::cout << "\n";
+
+		for (int i = 0; i < signatureSize; i++) { // for loop for scrambing bits in the string 
+			retrievedSig[i] = readSignature[i] ^ (char)key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
+			std::cout << retrievedSig[i];
+		}
+		retrievedSig[signatureSize] = '\0';
+		std::cout << "\n";
+
+		if (!strcmp(retrievedSig, mainsignature)) return 1;
+
+		i = KEY_SIZE - 1;
+		key[i]++;
+
+		while ((int)key[i] > ENDASCII) {
+			
+			key[i] = STARTASCII;
+			key[--i]++;
+		}
+
+	}
+
+	return 0;
 }
