@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
 		printf("usage:\n"
 			" Packer Path Mask ArchiveName.bin [sfx]\n"
 			" example:\n"
-			" Packer c:\\games\\mygame *.* c:\\test.bin\n"
-			" Packer c:\\games\\mygame *.* c:\\test.bin\n sfx (this will make SFX)");
+			" Packer g:\\in *.* g:\\archive.bin\n"
+			" Packer g:\\in *.* g:\\archive.bin\n sfx (this will make SFX)");
 		return 0;
 	}
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 	pcb.fileprogress = fileprogress;
 	pcb.newfile = newfile;
 
-	printf("Packer v1.0 (c) lallous\n");
+	printf("EVADER project v1.0\n");
 
 	// create archive file
 	int rc = packfilesEx(argv[1], argv[2], argv[3], &pcb);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 			printf("Could not create SFX file!\n");
 			return 1;
 		}
-
+	
 		// append data to SFX
 		FILE *fpSfx = fopen(sfxName, "rb+");
 		fseek(fpSfx, 0, SEEK_END);

@@ -48,9 +48,7 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 		std::cout << SIG[i];
 	}
 		
-	//std::cout << "\n" << sizeof(SIG) << "\n";
-	//Sleep(2000);
-
+		
 	do {
 
 		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) continue;
@@ -72,8 +70,6 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 
 	if (!fpArchive) return packerrorCannotCreateArchive;
 
-	// write signature
-	//lTemp = 'KCPL';
 	fwrite(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
 	// write entries count
@@ -124,11 +120,11 @@ int packfiles(char* path, char* mask, char* archive) {
 	return packfilesEx(path, mask, archive, NULL);
 }
 
-int unpackfiles(char* archive, char* dest, long startPos) {
-	return unpackfilesEx(archive, dest, startPos, NULL);
+int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos, packcallbacks_t * pcb) {
+	return unpackfilesEx(archive, dest, filesList, startPos, pcb);
 }
 
-int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb) {
+int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos, packcallbacks_t * pcb) {
 
 	FILE* fpArchive = fopen(archive, "rb");
 
@@ -151,8 +147,8 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 
 	for (int i = 0; i < KEY_SIZE; i++)
 		std::cout << key[i];
-	std::cout << "\nbuuuuuuuu";
-	Sleep(2000);
+	//std::cout << "\nsuccess";
+	//Sleep(2000);
 
 	// read files entries count
 	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
@@ -160,9 +156,9 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 	// no files?
 	if (!nFiles) return (fclose(fpArchive), packerrorNoFiles);
 
-	// read all files entries
-	std::vector<packdata_t> filesList(nFiles);
 	fread(&filesList[0], sizeof(packdata_t), nFiles, fpArchive);
+
+	filesList.resize(nFiles);
 
 	// loop in all files
 	for (unsigned int i = 0; i < filesList.size(); i++) {
@@ -204,8 +200,11 @@ int unpackfilesEx(char* archive, char* dest, long startPos, packcallbacks_t* pcb
 
 	}
 
+
 	fclose(fpArchive);
 	return packerrorSuccess;
+
+	
 
 }
 
@@ -259,7 +258,6 @@ void setKey(char* key, int key_size) {
 	srand(time(NULL));
 
 	for (int i = 0; i < key_size; ++i) {
-		//key[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
 		key[i] = char(STARTASCII + rand() % (ENDASCII - STARTASCII + 1));
 		std::cout << key[i];
 	}
@@ -278,11 +276,6 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 		key[k] = STARTASCII;
 
 	while (i > -1) {
-
-		//print(retKey);
-		//for (int i = 0; i < KEY_SIZE; i++)
-			//std::cout << key[i];
-		//std::cout << "\n";
 
 		for (int i = 0; i < signatureSize; i++) { // for loop for scrambing bits in the string 
 			retrievedSig[i] = readSignature[i] ^ (char)key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string

@@ -1,4 +1,6 @@
-﻿  packer.cpp
+﻿  packroutines.cpp
+c:\users\koorosh\source\repos\stallingunpacker\stallingunpacker\packroutines.cpp(265): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   unpacksfxstub.cpp
+c:\users\koorosh\source\repos\stallingunpacker\stallingunpacker\unpacksfxstub.cpp(43): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
   stallingUnpacker.vcxproj -> C:\Users\Koorosh\source\repos\stallingUnpacker\Debug\stallingUnpacker.exe

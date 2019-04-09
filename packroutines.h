@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <vector>
 #include <iostream>
-#include <conio.h>
 #include <time.h>
 
 
@@ -39,13 +38,15 @@ typedef struct {
 int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* = NULL);
 int packfiles(char *path, char *mask, char *archive);
 
-int unpackfilesEx(char *archive, char *dest, long startPos = 0, packcallbacks_t * = NULL);
-int unpackfiles(char *archive, char *dest, long startPos = 0);
+int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos = 0, packcallbacks_t * = NULL);
+int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos = 0, packcallbacks_t * = NULL);
 
 int SfxSetInsertPos(char *filename, long pos);
 int SfxGetInsertPos(char *filename, long *pos);
 
 void setKey(char* key, int key_size);
 bool retrieveKey(char* readSignature, int signatureSize);
+
+VOID startup(LPCTSTR lpApplicationName);
 
 #endif
