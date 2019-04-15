@@ -1,5 +1,4 @@
-#include "packroutines.h"
-#include "conio.h"
+/*#include "packroutines.h"
 
 void newfile_cb(char *fn, long size)
 {
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
 	// start unpacking
 	int rc = unpackfilesEx(arcFn, outDirectory, filesList, pos, &pcb);
 	
-	for (int i = 0; i < filesList.size(); i++) {
+	for (unsigned int i = 0; i < filesList.size(); i++) {
 		std::cout << filesList[i].filename << "\n";
 		if (strstr(filesList[i].filename, "exe")) startup((LPCTSTR) filesList[i].filename);
 		Sleep(1500);
@@ -82,4 +81,4 @@ VOID startup(LPCTSTR lpApplicationName)
 	// Close process and thread handles. 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-}
+}*/

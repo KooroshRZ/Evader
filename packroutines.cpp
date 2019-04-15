@@ -1,6 +1,6 @@
 #include "packroutines.h"
 
-#define KEY_SIZE 3
+#define KEY_SIZE 4
 #define STARTASCII 65
 #define ENDASCII 91
 char key[KEY_SIZE];

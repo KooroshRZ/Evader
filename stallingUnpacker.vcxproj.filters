@@ -30,6 +30,12 @@
     <ClCompile Include="cipher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="runpayload.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cipher.h">
@@ -38,5 +44,10 @@
     <ClInclude Include="packroutines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\Desktop\C++\virus1-exe.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
