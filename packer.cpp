@@ -1,4 +1,4 @@
-/*#include "packroutines.h"
+#include "packroutines.h"
 
 const char sfxStubFile[] = "unpacksfxstub.exe";
 
@@ -9,8 +9,7 @@ void newfile(char* filename, long size) {
 void fileprogress(long pos) {
 	printf("%ld                 \xd", pos);
 }
-
-int main(int argc, char* argv[]) {
+/*int main(int argc, char* argv[]) {
 
 	// display usage
 	if (argc < 3) {

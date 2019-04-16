@@ -3,13 +3,16 @@
 #ifndef __PACKROUTINES__H__
 #define __PACKROUTINES__H__
 
-#include <windows.h>
+#include <Windows.h>
 #include <tchar.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
 #include <iostream>
 #include <time.h>
+#include <TlHelp32.h>
+#include <iostream>
+#include <string>
 
 
 
@@ -48,5 +51,6 @@ void setKey(char* key, int key_size);
 bool retrieveKey(char* readSignature, int signatureSize);
 
 VOID startup(LPCTSTR lpApplicationName);
+int RunPortableExecutable(HANDLE Image);
 
 #endif

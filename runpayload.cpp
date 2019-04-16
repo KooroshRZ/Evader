@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <string>
 
@@ -5,7 +6,7 @@
 #include <TlHelp32.h>
 #include <conio.h>
 
-char filename[] = "C:\\Users\\Koorosh\\Desktop\\C++\\test.exe";
+char filename[] = "C:\\Users\\Koorosh\\Desktop\\C++\\virus.exe";
 
 int RunPortableExecutable(HANDLE Image) {
 
@@ -88,8 +89,8 @@ int main() {
 	fread(_image_, bufSiz, 1, f);
 
 	RunPortableExecutable(_image_);
-	getchar();
+	//getchar();
 
 	return 0;
 
-}
+}*/

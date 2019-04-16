@@ -1,3 +1,4 @@
-﻿  runpayload.cpp
-c:\users\koorosh\source\repos\stallingunpacker\stallingunpacker\runpayload.cpp(75): warning C4715: 'RunPortableExecutable': not all control paths return a value
+﻿  packroutines.cpp
+c:\users\koorosh\source\repos\stallingunpacker\stallingunpacker\packroutines.cpp(273): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\koorosh\source\repos\stallingunpacker\stallingunpacker\packroutines.cpp(387): warning C4715: 'RunPortableExecutable': not all control paths return a value
   stallingUnpacker.vcxproj -> C:\Users\Koorosh\source\repos\stallingUnpacker\Debug\stallingUnpacker.exe
