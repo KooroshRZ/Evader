@@ -1,4 +1,4 @@
-#include "packroutines.h"
+/*#include "packroutines.h"
 
 void newfile_cb(char *fn, long size)
 {
@@ -39,47 +39,10 @@ int main(int argc, char *argv[])
 	// start unpacking
 	int rc = unpackfilesEx(arcFn, outDirectory, filesList, pos, &pcb);
 	
-	/*for (unsigned int i = 0; i < filesList.size(); i++) {
-		std::cout << filesList[i].filename << "\n";
-		if (strstr(filesList[i].filename, "exe")) startup((LPCTSTR) filesList[i].filename);
-		Sleep(1500);
-	}*/
-
-	
 	if (rc != packerrorSuccess)
 		printf("%s\n", packerrors_str[rc]);
 	else
 		printf("\nOperation succeeded!\n");
 
 	return 0;
-}
-
-VOID startup(LPCTSTR lpApplicationName)
-{
-	// additional information
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-
-	// set the size of the structures
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
-
-	// start the program up
-	CreateProcess(lpApplicationName,   // the path
-		NULL,			// Command line
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		FALSE,          // Set handle inheritance to FALSE
-		0,              // No creation flags
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
-		&si,            // Pointer to STARTUPINFO structure
-		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-	);
-
-	// Close process and thread handles. 
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-	
-}
+}*/

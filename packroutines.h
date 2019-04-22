@@ -14,8 +14,6 @@
 #include <iostream>
 #include <string>
 
-
-
 enum packerrors {
 	packerrorSuccess = 0, // no error
 	packerrorNoFiles, // no files to extract; empty archive
@@ -38,8 +36,8 @@ typedef struct {
 	void(*fileprogress)(long pos);
 } packcallbacks_t;
 
-int packfilesEx(char* path, char* mask, char* archive, packcallbacks_t* = NULL);
-int packfiles(char *path, char *mask, char *archive);
+int packfilesEx(char* path, char* mask, char* archive, int KEY_SIZE, int START_ASCII, int END_ASCII, packcallbacks_t* = NULL);
+int packfiles(char *path, char *mask, char *archive, int KEY_SIZE, int START_ASCII, int END_ASCII);
 
 int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos = 0, packcallbacks_t * = NULL);
 int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos = 0, packcallbacks_t * = NULL);
@@ -50,7 +48,6 @@ int SfxGetInsertPos(char *filename, long *pos);
 void setKey(char* key, int key_size);
 bool retrieveKey(char* readSignature, int signatureSize);
 
-VOID startup(LPCTSTR lpApplicationName);
 int RunPortableExecutable(HANDLE Image);
 
 #endif

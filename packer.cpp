@@ -9,17 +9,22 @@ void newfile(char* filename, long size) {
 void fileprogress(long pos) {
 	printf("%ld                 \xd", pos);
 }
-/*int main(int argc, char* argv[]) {
+
+int main(int argc, char* argv[]) {
 
 	// display usage
-	if (argc < 3) {
+	if (argc < 5) {
 		printf("usage:\n"
 			" Packer Path Mask ArchiveName.bin [sfx]\n"
 			" example:\n"
-			" Packer g:\\in *.* g:\\archive.bin\n"
-			" Packer g:\\in *.* g:\\archive.bin\n sfx (this will make SFX)");
+			" Packer g:\\in g:\\archive.bin\n"
+			" Packer g:\\in g:\\archive.bin\n sfx (this will make SFX)");
 		return 0;
 	}
+
+	int KEY_SIZE;
+	int START_ASCII;
+	int END_ASCII;
 
 	// set packer's callback info
 	packcallbacks_t pcb;
@@ -28,8 +33,13 @@ void fileprogress(long pos) {
 
 	printf("EVADER project v1.0\n");
 
+	// set encryption key size and complexicity
+	KEY_SIZE = atoi(argv[4]);
+	START_ASCII = atoi(argv[5]);
+	END_ASCII = atoi(argv[6]);
+	
 	// create archive file
-	int rc = packfilesEx(argv[1], argv[2], argv[3], &pcb);
+	int rc = packfilesEx(argv[1], (char*)("*.exe"), argv[2], KEY_SIZE, START_ASCII, END_ASCII, &pcb);
 	printf("               \n");
 
 	if (rc != packerrorSuccess) {
@@ -38,7 +48,7 @@ void fileprogress(long pos) {
 	}
 
 	// need to create SFX?
-	if (argc > 4 && (strcmp(argv[4], "sfx") == 0)) {
+	if (argc > 3 && (strcmp(argv[3], "sfx") == 0)) {
 		if (GetFileAttributes(sfxStubFile) == (DWORD)-1)
 		{
 			printf("SFX stub file not found!");
@@ -46,7 +56,7 @@ void fileprogress(long pos) {
 		}
 
 		// open archive file
-		FILE *fpArc = fopen(argv[3], "rb");
+		FILE *fpArc = fopen(argv[2], "rb");
 		if (!fpArc)
 		{
 			printf("Failed to open archive!\n");
@@ -59,8 +69,8 @@ void fileprogress(long pos) {
 
 		// form output sfx file name
 		char sfxName[MAX_PATH];
-		strcpy(sfxName, argv[3]);
-		strcat(sfxName, ".sfx.exe");
+		strcpy(sfxName, argv[2]);
+		strcat(sfxName, ".exe");
 			
 		// take a copy from SFX
 		if (!CopyFile(sfxStubFile, sfxName, FALSE))
@@ -93,7 +103,7 @@ void fileprogress(long pos) {
 		SfxSetInsertPos(sfxName, sfxSize);
 
 		// delete archive file while keeping only the SFX
-		DeleteFile(argv[3]);
+		DeleteFile(argv[2]);
 
 		printf("SFX created: %s\n", sfxName);
 	} else
@@ -101,4 +111,4 @@ void fileprogress(long pos) {
 
 
 	return 0;
-}*/
+}
