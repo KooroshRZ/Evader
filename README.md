@@ -1,11 +1,20 @@
-Evader
+Telethon
 ========
 .. epigraph::
 
   ⭐️ Thanks **everyone** who has starred the project, it means a lot!
-  
+
+|logo| **Telethon** is an asyncio_ **Python 3**
+MTProto_ library to interact with Telegram_'s API
+as a user or through a bot account (bot API alternative).
+
+
+
+Evader
+========
+.. epigraph::
+
   tnx for https://www.codeproject.com/Articles/5035/How-to-Write-a-Simple-Packer-Unpacker-with-a-Self
-  
   tnx for https://www.youtube.com/watch?v=bQWRW0VUXR4
 
 It's a exe packer which will encrypt your PE exe input file and add it as resource to the end of the output new exe file
