@@ -1,20 +1,7 @@
-Telethon
-========
-.. epigraph::
-
-  ⭐️ Thanks **everyone** who has starred the project, it means a lot!
-
-|logo| **Telethon** is an asyncio_ **Python 3**
-MTProto_ library to interact with Telegram_'s API
-as a user or through a bot account (bot API alternative).
-
-
-
 Evader
 ========
-.. epigraph::
-
   tnx for https://www.codeproject.com/Articles/5035/How-to-Write-a-Simple-Packer-Unpacker-with-a-Self
+  
   tnx for https://www.youtube.com/watch?v=bQWRW0VUXR4
 
 It's a exe packer which will encrypt your PE exe input file and add it as resource to the end of the output new exe file
@@ -31,3 +18,11 @@ The complexity of encryption key will be determined by <start-ascii> and <end-as
 for example this command will lead to keys from AAAA to ZZZZ
 
     packer.exe <input-path> <output-path> 4 65 90
+    
+The Decryption part
+-------------------
+Decryption isn't like other packers stub and it's based on bruteforcing and examining each character to retrieve the encryption key! why!?
+
+And after retrieving key the encrypted payload will be decrypted and will be run directly from memory in and format of char[] whcih is contained each byte ot the main PE file!
+
+just complile the unpacksfxstub and put it in your packer.exe directory and just run the above commands!
