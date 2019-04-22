@@ -5,13 +5,12 @@ It's a exe packer which will encrypt your PE exe input file and add it as resour
 
 the encryption key size and complexity can be given as input
 
-Usage
-----------
-just run this command to make you file packed
+Usage of packer
+-----------------
 
 .. code-block:: batch
 
-  packer.exe <input-path> <output-path> <key-size> <start-ascii> <end-ascii>
+    packer.exe <input-path> <output-path> <key-size> <start-ascii> <end-ascii>
   
 The complexity of encryption key will be determined by <start-ascii> and <end-ascii>
   
@@ -19,7 +18,7 @@ for example this command will lead to keys from AAAA to ZZZZ
 
 .. code-block:: batch
 
-  packer.exe <input-path> <output-path> 4 65 90
+    packer.exe <input-path> <output-path> 4 65 90
 
 
 
