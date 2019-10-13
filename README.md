@@ -4,7 +4,7 @@ Evader
   
   tnx for https://www.youtube.com/watch?v=bQWRW0VUXR4
 
-It's a exe packer which will encrypt your PE exe input file and add it as resource to the end of the output new exe file
+It's an exe packer which will encrypt your PE exe input file and add it as resource to the end of the output new exe file
 
 the encryption key size and complexity can be given as input
 
@@ -23,6 +23,4 @@ The Decryption part
 -------------------
 Decryption isn't like other packers stub and it's based on bruteforcing and examining each character to retrieve the encryption key! why!?
 
-And after retrieving key the encrypted payload will be decrypted and will be run directly from memory in and format of char[] whcih is contained each byte ot the main PE file!
-
-just complile the unpacksfxstub and put it in your packer.exe directory and just run the above commands!
+And after retrieving key the encrypted payload will be decrypted and will be run directly inside memory and in form of char[] whcih is contained each byte of the main PE file!
