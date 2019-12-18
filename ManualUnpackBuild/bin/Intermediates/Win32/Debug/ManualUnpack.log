@@ -1,7 +1,0 @@
-﻿  packroutines.cpp
-c:\users\k.rajabzadeh\source\repos\packer\manualunpack\src\packroutines.cpp(172): warning C4101: 'fpOut': unreferenced local variable
-c:\users\k.rajabzadeh\source\repos\packer\manualunpack\src\packroutines.cpp(257): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  unpacker.cpp
-  Generating Code...
-c:\users\k.rajabzadeh\source\repos\packer\manualunpack\src\packroutines.cpp(368): warning C4715: 'RunPortableExecutable': not all control paths return a value
-  ManualUnpack.vcxproj -> C:\Users\k.rajabzadeh\source\repos\packer\ManualUnpackBuild\bin\Win32\Debug\ManualUnpack.exe
