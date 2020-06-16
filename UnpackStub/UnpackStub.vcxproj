@@ -134,11 +134,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\packroutines.cpp" />
-    <ClCompile Include="src\unpacksfxstub.cpp" />
+    <ClCompile Include="src\Execution\CreateRemoteThread.cpp" />
+    <ClCompile Include="src\Execution\Execution.cpp" />
+    <ClCompile Include="src\Execution\NtCreateThreadEx.cpp" />
+    <ClCompile Include="src\Execution\QueueUserAPC.cpp" />
+    <ClCompile Include="src\Execution\RtlCreateUserThread.cpp" />
+    <ClCompile Include="src\Execution\SetWindowsHookEx.cpp" />
+    <ClCompile Include="src\Stub\PackRoutines-Stub.cpp" />
+    <ClCompile Include="src\Execution\RunPE.cpp" />
+    <ClCompile Include="src\Stub\UnpackStub.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\packroutines.h" />
+    <ClInclude Include="src\Execution\Execution.h" />
+    <ClInclude Include="src\Stub\PackRoutines-Stub.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

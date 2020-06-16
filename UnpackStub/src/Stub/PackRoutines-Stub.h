@@ -48,6 +48,5 @@ int SfxGetInsertPos(char *filename, long *pos);
 void setKey(char* key, int key_size);
 bool retrieveKey(char* readSignature, int signatureSize);
 
-int RunPortableExecutable(HANDLE Image);
 
 #endif

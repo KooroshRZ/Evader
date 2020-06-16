@@ -18,12 +18,12 @@
     <ClCompile Include="src\packer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\packroutines.cpp">
+    <ClCompile Include="src\PackRoutines-Packer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\packroutines.h">
+    <ClInclude Include="src\PackRoutines-Packer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -135,10 +135,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\packer.cpp" />
-    <ClCompile Include="src\packroutines.cpp" />
+    <ClCompile Include="src\PackRoutines-Packer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\packroutines.h" />
+    <ClInclude Include="src\PackRoutines-Packer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
