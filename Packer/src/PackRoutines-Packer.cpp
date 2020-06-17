@@ -18,7 +18,7 @@ int KEY_SIZE;
 int START_ASCII;
 int END_ASCII;
 
-int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII, int exeMethod, packcallbacks_t* pcb) {
+int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII, int exeMethod, char* targetProgram, packcallbacks_t* pcb) {
 
 	TCHAR szCurDir[MAX_PATH];
 
@@ -87,6 +87,11 @@ int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASC
 
 	// write execution method
 	fwrite(&exeMethod, sizeof(int), 1, fpArchive);
+
+	//write targetprogram name
+	fwrite(targetProgram, sizeof(char), 80, fpArchive);
+	//printf("%s", targetProgram);
+	//Sleep(5000);
 
 	// Write entries count
 	nfiles = filesList.size();

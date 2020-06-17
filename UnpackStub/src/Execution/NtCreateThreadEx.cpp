@@ -16,17 +16,9 @@ bool NtCreateThreadEx_Type2(LPCSTR DllPath, HANDLE hProcess) {
 	Sleep(1000);
 	//system("PAUSE");
 	
-	MODULEINFO modInfo;
-	GetModuleInformation(hProcess, GetModuleHandle("Telegram.exe"), &modInfo, sizeof(MODULEINFO));
-	LPVOID lpAddress = modInfo.lpBaseOfDll;
-
-	printf("\n%p\n", lpAddress);
-	
 	
 	LPVOID pDllPath = VirtualAllocEx(hProcess, NULL, strlen(DllPath), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
 	
-
 	if (!pDllPath) {
 		printf("Could not allocate Memory in target process\n");
 		printf("LastError : 0X%x\n", GetLastError());

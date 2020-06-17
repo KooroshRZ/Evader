@@ -1,5 +1,7 @@
 #include "Execution.h"
 
+#ifndef _WIN64
+
 int RunPortableExecutable(HANDLE Image) {
 
 	IMAGE_DOS_HEADER* DOSHeader;
@@ -66,3 +68,5 @@ int RunPortableExecutable(HANDLE Image) {
 	}
 
 }
+
+#endif

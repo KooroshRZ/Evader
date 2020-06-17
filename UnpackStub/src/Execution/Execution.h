@@ -23,7 +23,7 @@
 
 int initializeInjection(char * targetProgram, LPCSTR DllPath, int InjectionMethod = -1);
 
-int RunImage(HANDLE Image);
+//int RunImage(HANDLE Image);
 
 // tech 0 ---> Run PE
 int RunPortableExecutable(HANDLE Image);

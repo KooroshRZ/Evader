@@ -8,6 +8,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ManualUnpack", "ManualUnpack\ManualUnpack.vcxproj", "{00E651F5-67DD-483D-BC2A-54876B874CDF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Packer", "Packer\Packer.vcxproj", "{99F55056-7143-48B1-ABCA-F687DA4EEBC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7EF127A6-58F2-49A8-9A0F-95E182A23184} = {7EF127A6-58F2-49A8-9A0F-95E182A23184}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

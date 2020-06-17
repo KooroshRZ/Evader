@@ -1,5 +1,5 @@
 #include "Execution.h"
-
+/*
 #ifdef _WIN64
 LPCSTR DllPath = "C:\\Users\\k.rajabzadeh\\source\\repos\\Windows-DLL-Injector\\PayloadDLLBuild\\bin\\Debug\\x64\\PayloadDLL.dll";
 //LPCSTR DllPath = "C:\\Users\\kourosh\\source\\repos\\WindowsIATHooking\\IATHookingBuild\\bin\\Debug\\x64\\WindowsIATHooking.dll";
@@ -7,12 +7,13 @@ LPCSTR DllPath = "C:\\Users\\k.rajabzadeh\\source\\repos\\Windows-DLL-Injector\\
 LPCSTR DllPath = "C:\\Users\\k.rajabzadeh\\source\\repos\\Windows-DLL-Injector\\PayloadDLLBuild\\bin\\Debug\\Win32\\PayloadDLL.dll";
 //LPCSTR DllPath = "C:\\Users\\kourosh\\source\\repos\\WindowsIATHooking\\IATHookingBuild\\bin\\Debug\\Win32\\WindowsIATHooking.dll";
 #endif
+*/
 
 // variables for Privilege Escalation
 HANDLE hToken;
 int dwRetVal = RTN_OK;
 
-int initializeInjection(char * targetProgram, LPCSTR DllPath, int InjectionMethod = -1) {
+int initializeInjection(char * targetProgram, LPCSTR DllPath, int InjectionMethod) {
 
 	/*
 	printf("escalating Privileges...\n");
@@ -27,9 +28,6 @@ int initializeInjection(char * targetProgram, LPCSTR DllPath, int InjectionMetho
 
 	char szProc[80];
 	strcpy(szProc, targetProgram);
-
-	printf("Target process name : ");
-	scanf_s("%79s", szProc, 79);
 
 	PROCESSENTRY32 PE32{ sizeof(PROCESSENTRY32) };
 	PE32.dwSize = sizeof(PE32);
@@ -72,16 +70,6 @@ int initializeInjection(char * targetProgram, LPCSTR DllPath, int InjectionMetho
 
 	printf("Target Program PID: %d\n\n", PID);
 
-
-	printf("\n\n");
-	printf("   1) CreateRemoteThread\n");
-	printf("   2) NtCreateThread\n");
-	printf("   3) QueueUserAPC\n");
-	printf("   4) SetWindowsHookEx\n");
-	printf("   5) RtlCreateUserThread\n");
-	printf("\n\n\n");
-	printf("Enter the Injection method: ");
-	scanf("%d", &InjectionMethod);
 
 	HANDLE hProcess = OpenProcess(
 		PROCESS_QUERY_INFORMATION |
