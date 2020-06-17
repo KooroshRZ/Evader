@@ -19,14 +19,10 @@ int main(int argc, char* argv[]) {
 		printf(
 			"EVADER project v1.0\n"
 			"usage:\n"
-			" Packer.exe inputfile_Path(like c:\\users\\xxx\\files\ whilc containst your files/file) outputfile_name(like c:\\users\\xxx\\output\\output.exe) KEY_SIZE KEY_START_ASCII KEY_END_ASCII\n"
-			"List of available methods"
-			"[RUN-PE] execute your payload directly inside current process memory address space in form of PE file"
-			"[CreateRremoteThread] DLL injection with CreateRemoteThread Win32 API in target Process"
-			"[NtCreatThreadEx]"
+			" Packer.exe inputfile_Path(like c:\\users\\xxx\\files\\ whilc containst your files/file) outputfile_name(like c:\\users\\xxx\\output\\output.exe) KEY_SIZE KEY_START_ASCII KEY_END_ASCII\n"
 			" example:\n"
-			" Packer c:\\users\\xxx\\files\ c:\\users\\xxx\\files\\ 7 65 90"
-			"Thic commands encrypt all files(.exe) inside c:\\users\\xxx\\files\ and write output to c:\\users\\xxx\\output\\output.exe with key size 7 and from AAAA(65.65.65.65) to ZZZZ(90.90.90.90)"
+			" Packer c:\\users\\xxx\\files\\ c:\\users\\xxx\\files\\ 7 65 90"
+			"Thic commands encrypt all files(.exe) inside c:\\users\\xxx\\files\\ and write output to c:\\users\\xxx\\output\\output.exe with key size 7 and from AAAA(65.65.65.65) to ZZZZ(90.90.90.90)"
 			"\n\n\n"
 		);
 		return 0;
@@ -54,11 +50,8 @@ int main(int argc, char* argv[]) {
 		scanf_s("%79s", szProc, 79);
 	}
 	else {
-		memcpy(szProc, (PVOID)'x', sizeof(szProc));
+		strcpy(szProc, "xxxxxxxx");
 	}
-
-	printf("\n\n*****%d****\n\n", sizeof(szProc));
-	printf("\n\n*****%s****\n\n", szProc);
 
 
 	int KEY_SIZE;
@@ -76,7 +69,7 @@ int main(int argc, char* argv[]) {
 	END_ASCII = atoi(argv[5]);
 	
 	// create archive file
-	int rc = packfilesEx(argv[1], (char*)("*.dll"), argv[2], KEY_SIZE, START_ASCII, END_ASCII, exeMethod, szProc, &pcb);
+	int rc = packfilesEx(argv[1], (char*)("*.exe"), argv[2], KEY_SIZE, START_ASCII, END_ASCII, exeMethod, szProc, &pcb);
 	printf("               \n");
 
 	if (rc != packerrorSuccess) {

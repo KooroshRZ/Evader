@@ -25,6 +25,7 @@ enum packerrors {
 	packerrorKeyNotFound // failed to retrieve key by bruteforcing
 };
 
+
 extern const char *packerrors_str[];
 
 typedef struct {
@@ -41,7 +42,6 @@ int packfilesEx(char* path, char* mask, char* archive, int KEY_SIZE, int START_A
 int packfiles(char *path, char *mask, char *archive, int KEY_SIZE, int START_ASCII, int END_ASCII ,int exeMethod, char* targetProgram);
 
 int SfxSetInsertPos(char *filename, long pos);
-int SfxGetInsertPos(char *filename, long *pos);
 
 void setKey(char* key, int key_size);
 

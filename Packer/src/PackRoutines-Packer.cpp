@@ -39,7 +39,7 @@ int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASC
 		return packerrorNoFiles;
 
 	char SIG[13];
-	long nfiles;
+	SIZE_T nfiles;
 
 	KEY_SIZE = KEYSIZE;
 	START_ASCII = STARTASCII;
@@ -89,7 +89,8 @@ int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASC
 	fwrite(&exeMethod, sizeof(int), 1, fpArchive);
 
 	//write targetprogram name
-	fwrite(targetProgram, sizeof(char), 80, fpArchive);
+	if (exeMethod > 0)
+		fwrite(targetProgram, sizeof(char), 80, fpArchive);
 	//printf("%s", targetProgram);
 	//Sleep(5000);
 
@@ -137,24 +138,10 @@ int packfilesEx(char* path, char* mask, char* archive, int KEYSIZE, int STARTASC
 
 }
 
-int packfiles(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII, int exeMethod) {
-	return packfilesEx(path, mask, archive, KEYSIZE, STARTASCII, ENDASCII, exeMethod, NULL);
+int packfiles(char* path, char* mask, char* archive, int KEYSIZE, int STARTASCII, int ENDASCII, int exeMethod, char* targetProgram) {
+	return packfilesEx(path, mask, archive, KEYSIZE, STARTASCII, ENDASCII, exeMethod, targetProgram, NULL);
 }
 
-
-int SfxGetInsertPos(char *filename, long *pos){
-
-	FILE *fp = fopen(filename, "rb");
-	if (fp == NULL)
-		return packerrorCouldNotOpenArchive;
-
-	IMAGE_DOS_HEADER idh;
-
-	fread((void *)&idh, sizeof(idh), 1, fp);
-	fclose(fp);
-	*pos = *(long *)&idh.e_res2[0];
-	return packerrorSuccess;
-}
 
 int SfxSetInsertPos(char *filename, long pos){
 
@@ -180,7 +167,7 @@ int SfxSetInsertPos(char *filename, long pos){
 
 void setKey(char* key, int key_size) {
 
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	std::cout << "encryption key : ";
 	for (int i = 0; i < key_size; ++i) {

@@ -24,6 +24,7 @@ enum packerrors {
 	packerrorCouldNotOpenArchive // failed to open archive for extraction
 };
 
+
 extern const char *packerrors_str[];
 
 typedef struct {
@@ -42,11 +43,8 @@ int unpackfiles(char *archive, char *dest, std::vector<packdata_t> &filesList, l
 
 int RunImage(char* Image,int imSize, int exeMethod, char* targetProgram);
 
-int SfxSetInsertPos(char *filename, long pos);
 int SfxGetInsertPos(char *filename, long *pos);
 
-void setKey(char* key, int key_size);
 bool retrieveKey(char* readSignature, int signatureSize);
-
 
 #endif
